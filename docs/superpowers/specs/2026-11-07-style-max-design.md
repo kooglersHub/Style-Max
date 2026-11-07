@@ -1,7 +1,7 @@
 # Style-Max design
 
 Date: 2026-11-07
-Status: proposed; standalone application approach selected by the user. Implementation awaits design approval.
+Status: approved by the user on 2026-11-07; implementation in progress.
 
 ## Purpose
 

@@ -13,7 +13,9 @@ def kleinanzeigen(garment):
     rows = client.search(q=f"{garment['keywords']} {garment['size']}", pages=1, size=12)
     results = []
     for row in rows[:12]:
-        if row.price is None or row.price_type not in ("FIXED", "NEGOTIABLE", "FREE"):
+        price_type = (row.price_type or "").upper()
+        free = price_type in ("FREE", "GIVE_AWAY")
+        if not free and (row.price is None or row.price <= 0):
             continue
         attributes = row.attributes or {}
         results.append(
@@ -21,7 +23,7 @@ def kleinanzeigen(garment):
                 external_id=str(row.id),
                 url=row.url,
                 title=row.title,
-                price=float(row.price),
+                price=0.0 if free else float(row.price),
                 image=(row.images or [None])[0],
                 size=attributes.get("Größe"),
                 location=row.city or "",

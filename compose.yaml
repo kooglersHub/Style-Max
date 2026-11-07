@@ -1,0 +1,21 @@
+services:
+  studio:
+    build: .
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - stylemax-data:/app/data
+    environment:
+      STYLEMAX_OLLAMA_URL: http://host.docker.internal:11434
+      STYLEMAX_OLLAMA_MODEL: ${STYLEMAX_OLLAMA_MODEL:-qwen2.5:7b}
+      STYLEMAX_IMAGE_WORKER_URL: ${STYLEMAX_IMAGE_WORKER_URL:-}
+      STYLEMAX_IMAGE_WORKER_KEY: ${STYLEMAX_IMAGE_WORKER_KEY:-}
+      STYLEMAX_EBAY_CLIENT_ID: ${STYLEMAX_EBAY_CLIENT_ID:-}
+      STYLEMAX_EBAY_CLIENT_SECRET: ${STYLEMAX_EBAY_CLIENT_SECRET:-}
+      STYLEMAX_ENABLE_KLEINANZEIGEN: ${STYLEMAX_ENABLE_KLEINANZEIGEN:-false}
+      STYLEMAX_ENABLE_VINTED: ${STYLEMAX_ENABLE_VINTED:-false}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+volumes:
+  stylemax-data:

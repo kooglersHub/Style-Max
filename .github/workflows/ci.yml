@@ -1,0 +1,29 @@
+name: Validate studio
+on: [push, pull_request]
+jobs:
+  backend:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --frozen --extra dev --extra marketplaces
+      - run: uv run --no-sync pytest
+      - run: uv run --no-sync ruff check src tests worker
+      - run: uv run --no-sync ruff format --check src tests worker
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm install --global pnpm@11.25.0
+      - run: pnpm --dir frontend install --frozen-lockfile
+      - run: pnpm --dir frontend test
+      - run: pnpm --dir frontend lint
+      - run: pnpm --dir frontend build
