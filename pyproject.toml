@@ -10,7 +10,7 @@ requires-python = ">=3.12"
 dependencies = ["fastapi>=0.115,<0.130", "uvicorn>=0.30,<1", "pydantic-settings>=2.7,<3", "httpx>=0.28,<1", "python-multipart>=0.0.20", "Pillow>=11,<13"]
 
 [project.optional-dependencies]
-marketplaces = ["kleinanzeigen-api>=0.4,<0.5", "vinted-scraper>=2.4,<3"]
+marketplaces = ["kleinanzeigen-api>=0.4,<0.5", "vinted-scraper>=5.2,<6"]
 dev = ["pytest>=8,<10", "ruff>=0.9,<1"]
 
 [tool.pytest.ini_options]

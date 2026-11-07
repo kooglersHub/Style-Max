@@ -20,7 +20,7 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { api, sourceName } from "./api";
 import { BriefForm } from "./components/BriefForm";
 import { FitForm } from "./components/FitForm";
@@ -60,6 +60,7 @@ export default function App() {
   const [libraryOpen, setLibraryOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [chosen, setChosen] = useState<string[]>([]);
+  const handledJob = useRef<string | null>(null);
   const activeJob =
     project?.job && ["running", "queued"].includes(project.job.status);
   const busy = pending || !!activeJob;
@@ -98,9 +99,15 @@ export default function App() {
     if (project) localStorage.setItem("stylemax_project", project.id);
   }, [project]);
   useEffect(() => {
-    if (project?.job?.status === "completed" && project.job.kind === "preview")
-      setStage("preview");
-    if (project?.job?.status === "completed" && project.job.kind === "search")
+    if (
+      !project?.job ||
+      project.job.status !== "completed" ||
+      handledJob.current === project.job.id
+    )
+      return;
+    handledJob.current = project.job.id;
+    if (project.job.kind === "preview") setStage("preview");
+    if (project.job.kind === "search")
       setChosen(project.basket?.offer_ids || []);
   }, [project]);
 

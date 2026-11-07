@@ -29,6 +29,8 @@ class Jobs:
                 "total": 10 if kind == "looks" else 1,
             }
             project["error"] = None
+            if kind in ("search", "preview"):
+                project["preview"] = None
 
         self.store.update(project_id, claim)
         return job_id

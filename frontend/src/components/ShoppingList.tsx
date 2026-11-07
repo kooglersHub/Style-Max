@@ -97,7 +97,7 @@ export function ShoppingList({ project, busy, onSearch }: Props) {
                 <input
                   aria-label={`Budget for ${item.name}`}
                   type="number"
-                  min="1"
+                  min="0.01"
                   max="10000"
                   step="0.01"
                   required

@@ -81,6 +81,8 @@ Restart after changing `.env`. Keys remain on the server. Settings show whether 
 
 Results are ranked by keyword relevance, size evidence, budget and known shipping. Explicit size mismatches are excluded. Letter sizes in a listing title count as evidence; numeric tokens alone do not establish shoe/trouser sizes. Unknown size requires seller confirmation. Unknown shipping is not free; automatic basket selection uses known delivered costs. The total budget covers the **entire confirmed shopping list**, across selected looks. Verify measurements, fees, availability and condition before purchasing.
 
+Fit and shopping-category choices are included in source queries and direct search links. Composite size labels are parsed conservatively; mixed letter ranges stay unconfirmed. One physical listing can satisfy only one basket garment. Shopping lists support up to 60 pieces so all ten looks can be edited; large searches may stop at the per-source deadline and return partial results.
+
 The app compares bounded search results, not every listing. Platform fees and unknown charges are not included unless supplied by a source. Source clients are open source; that does not make marketplaces open APIs. See [third-party notes](THIRD_PARTY.md).
 
 ## Docker
@@ -112,6 +114,8 @@ SQLite metadata, uploads and generated images live in ignored `data/`. Photos ar
 Do not expose this release as a public multi-tenant service. Bind locally or use an authenticated private deployment. Internet hosting needs user authentication, quotas, durable job workers and operational controls. Use HTTPS and `STYLEMAX_SECURE_COOKIES=true` behind a correctly configured reverse proxy. Run a single Uvicorn worker: process-local locks, the generation semaphore and restart recovery assume one application process.
 
 The interface loads Google Fonts with system fallbacks. Listing images load directly from marketplace image hosts. Final-preview image fetching uses host allowlists, public-address validation, no redirects, and byte/time limits.
+
+Two small UI limitations remain: lookbook hearts are saved to the server on **Find my pieces**, so reloads before that can lose edits; basket completeness and unmatched-item metadata are exposed by the API but not prominently summarized in the interface. Check the selected pieces and subtotal before generating a preview.
 
 ## Structure
 

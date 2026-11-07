@@ -208,8 +208,11 @@ def create_app(settings=None, planner=None, renderer=None, sources=None):
             )
             if not garments or len({g["id"] for g in garments}) != len(garments):
                 raise HTTPException(422, "Provide a nonempty shopping list with unique item IDs")
-            if len(garments) > 30 or any(not g["size"].strip() for g in garments):
-                raise HTTPException(422, "Use at most 30 garments and specify each size")
+            if len(garments) > 60 or any(not g["size"].strip() for g in garments):
+                raise HTTPException(422, "Use at most 60 garments and specify each size")
+            for garment in garments:
+                garment["fit"] = body.sizes.fit
+                garment["audience"] = body.sizes.category
 
             def change(p):
                 p.update(sizes=body.sizes.model_dump(), garments=garments, budget=project["budget"])
@@ -312,6 +315,11 @@ def create_app(settings=None, planner=None, renderer=None, sources=None):
                 raise HTTPException(422, "Choose valid offers from this project")
             if len({offers[key]["garment_id"] for key in body.offer_ids}) != len(body.offer_ids):
                 raise HTTPException(422, "Choose one offer per garment")
+            identities = {
+                (offers[key]["source"], offers[key]["external_id"]) for key in body.offer_ids
+            }
+            if len(identities) != len(body.offer_ids):
+                raise HTTPException(422, "A physical listing can only be selected once")
             if renderer is None and not settings.image_worker_url:
                 raise HTTPException(503, "Connect the image worker first")
         job_id = jobs.start(project_id, "preview")

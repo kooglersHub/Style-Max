@@ -138,6 +138,8 @@ def build_shopping_list(project, sizes):
             item = dict(garment)
             item["look_ids"] = [look["id"]]
             item["size"] = sizes.get(item["category"], "One size")
+            item["fit"] = sizes.get("fit", "regular")
+            item["audience"] = sizes.get("category", "all")
             unique[key] = item
     garments = list(unique.values())
     weights = {"outerwear": 1.4, "tops": 0.6, "bottoms": 1, "shoes": 1.3, "accessories": 0.4}

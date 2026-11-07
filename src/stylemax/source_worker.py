@@ -5,12 +5,16 @@ import json
 import sys
 import time
 
+from .marketplaces import search_query
+from .models import Garment
+
 
 def kleinanzeigen(garment):
     from kleinanzeigen_api import KleinanzeigenAPI
 
     client = KleinanzeigenAPI(rate_limit=1.5, timeout=15, max_retries=1)
-    rows = client.search(q=f"{garment['keywords']} {garment['size']}", pages=1, size=12)
+    query = search_query(Garment.model_validate(garment))
+    rows = client.search(q=query, pages=1, size=12)
     results = []
     for row in rows[:12]:
         price_type = (row.price_type or "").upper()
@@ -37,9 +41,8 @@ def vinted(garment):
 
     time.sleep(1.5)
     client = VintedScraper("https://www.vinted.de")
-    rows = client.search(
-        {"search_text": f"{garment['keywords']} {garment['size']}", "per_page": 12}
-    )
+    query = search_query(Garment.model_validate(garment))
+    rows = client.search({"search_text": query, "per_page": 12})
     results = []
     for row in rows[:12]:
         price = row.price

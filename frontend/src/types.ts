@@ -1,4 +1,6 @@
 export interface Garment {
+  fit?: "relaxed" | "regular" | "slim";
+  audience?: "menswear" | "womenswear" | "all";
   id: string;
   name: string;
   category: "tops" | "outerwear" | "bottoms" | "shoes" | "accessories";

@@ -32,10 +32,20 @@ def valid_listing(source, url):
     )
 
 
+def search_query(garment):
+    parts = [garment.keywords, garment.size]
+    if garment.category not in ("shoes", "accessories") and garment.fit != "regular":
+        parts.append(garment.fit)
+    audience = {"menswear": "Herren", "womenswear": "Damen"}.get(garment.audience)
+    if audience:
+        parts.append(audience)
+    return " ".join(parts).strip()
+
+
 def search_links(garments):
     links = []
     for garment in garments:
-        query = f"{garment.keywords} {garment.size}".strip()
+        query = search_query(garment)
         urls = {
             "ebay": "https://www.ebay.de/sch/i.html?" + urlencode({"_nkw": query, "_sop": "15"}),
             "vinted": "https://www.vinted.de/catalog?" + urlencode({"search_text": query}),
@@ -83,7 +93,7 @@ class EbaySource:
                 "X-EBAY-C-MARKETPLACE-ID": "EBAY_DE",
             },
             params={
-                "q": f"{garment.keywords} {garment.size}",
+                "q": search_query(garment),
                 "limit": "12",
                 "filter": "priceCurrency:EUR,buyingOptions:{FIXED_PRICE}",
                 "sort": "price",
@@ -179,7 +189,7 @@ class MarketplaceSearch:
         self.cache, self.lock = {}, RLock()
 
     def cached_search(self, source, garment):
-        key = (source.name, garment.keywords, garment.size)
+        key = (source.name, search_query(garment))
         with self.lock:
             cached = self.cache.get(key)
             if cached and time.monotonic() - cached[0] < 300:

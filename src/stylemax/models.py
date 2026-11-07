@@ -25,7 +25,9 @@ class Garment(BaseModel):
     color: str = Field(min_length=1, max_length=50)
     keywords: str = Field(min_length=2, max_length=200)
     size: str = Field(default="", max_length=30)
-    budget: float = Field(default=40, ge=1, le=10000)
+    budget: float = Field(default=40, ge=0.01, le=10000)
+    fit: Literal["relaxed", "regular", "slim"] = "regular"
+    audience: Literal["menswear", "womenswear", "all"] = "all"
     look_ids: list[str] = Field(default_factory=list, max_length=10)
 
 
@@ -59,12 +61,12 @@ class Selection(BaseModel):
 
 class ShoppingUpdate(BaseModel):
     sizes: Sizes
-    garments: list[Garment] | None = Field(default=None, max_length=30)
+    garments: list[Garment] | None = Field(default=None, max_length=60)
     budget: float | None = Field(default=None, ge=20, le=10000)
 
 
 class PreviewRequest(BaseModel):
-    offer_ids: list[str] = Field(default_factory=list, max_length=30)
+    offer_ids: list[str] = Field(default_factory=list, max_length=60)
 
 
 class Offer(BaseModel):

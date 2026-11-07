@@ -8,7 +8,18 @@ def normalized_size(value):
 def size_evidence(requested, offer):
     requested = normalized_size(requested)
     if offer.size:
-        return "match" if normalized_size(offer.size) == requested else "mismatch"
+        text = offer.size.upper()
+        if normalized_size(text) == requested:
+            return "match"
+        letters = set(re.findall(r"(?<!\w)(?:XXXL|XXL|XL|XS|XXS|S|M|L)(?!\w)", text))
+        if requested.upper() in letters:
+            return "match" if len(letters) == 1 else "unknown"
+        if requested in {"xxs", "xs", "s", "m", "l", "xl", "xxl", "xxxl"} and letters:
+            return "mismatch"
+        # Mixed regional numeric labels and ranges need seller confirmation.
+        if re.fullmatch(r"\d+(?:[.,]\d+)?", text.strip()):
+            return "mismatch" if requested.isdigit() else "unknown"
+        return "unknown"
     tokens = re.findall(r"(?<!\w)(?:XXXL|XXL|XL|XS|XXS|S|M|L)(?!\w)", offer.title.upper())
     if requested in {"xxs", "xs", "s", "m", "l", "xl", "xxl", "xxxl"} and tokens:
         return "match" if requested in [x.lower() for x in tokens] else "mismatch"
@@ -61,12 +72,14 @@ def choose_basket(offers, budget, garment_ids=None):
         ):
             groups[item.garment_id].append(item)
     # Lowest known delivered cost reserves enough budget for the remaining garments.
-    chosen, unmatched, total = [], [], 0.0
+    chosen, unmatched, total, used = [], [], 0.0, set()
     for garment_id, candidates in groups.items():
         candidates.sort(key=lambda item: (item.price + item.shipping, -item.score))
+        candidates = [item for item in candidates if (item.source, item.external_id) not in used]
         if candidates and total + candidates[0].price + candidates[0].shipping <= budget:
             selected = candidates[0]
             chosen.append(selected.id)
+            used.add((selected.source, selected.external_id))
             total += selected.price + selected.shipping
         else:
             unmatched.append(garment_id)
